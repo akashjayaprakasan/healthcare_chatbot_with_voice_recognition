@@ -1,0 +1,197 @@
+<!doctype html>
+<html>
+  <head>
+    <title>AI Healthcare ChatBot With Voice Recognition</title>
+
+    <style>
+      body {
+        margin: 0;
+        font-family: "Courier New";
+        background: radial-gradient(circle at top, #021428, #000814);
+        color: #c9d8f0;
+      }
+
+      /* HEADER */
+      h1 {
+        text-align: center;
+        font-size: 60px;
+        color: white;
+        margin-top: 40px;
+      }
+
+      .subtitle {
+        text-align: center;
+        color: #4a90c4;
+        letter-spacing: 4px;
+        margin-bottom: 30px;
+      }
+
+      /* CARD */
+      .card {
+        width: 70%;
+        margin: auto;
+        background: rgba(5, 18, 40, 0.9);
+        border: 1px solid #0f2d4e;
+        border-radius: 20px;
+        padding: 30px;
+      }
+
+      /* TEXTAREA */
+      textarea {
+        width: 100%;
+        height: 120px;
+        background: #04101e;
+        color: #c9d8f0;
+        border: 1px solid #0f2d4e;
+        border-radius: 12px;
+        padding: 15px;
+        font-size: 16px;
+      }
+
+      /* TAGS */
+      .tags {
+        margin-top: 15px;
+      }
+
+      .tag {
+        display: inline-block;
+        border: 1px solid #0f3050;
+        color: #7eb8e8;
+        padding: 6px 14px;
+        margin: 5px;
+        border-radius: 20px;
+        cursor: pointer;
+      }
+
+      .tag:hover {
+        background: #1e3a5f;
+      }
+
+      /* BUTTON */
+      button {
+        margin-top: 20px;
+        width: 100%;
+        padding: 15px;
+        background: #2563eb;
+        color: white;
+        border: none;
+        border-radius: 12px;
+        font-size: 18px;
+        cursor: pointer;
+      }
+
+      /* VOICE BUTTON */
+      .voice-btn {
+        margin-top: 10px;
+        background: #16a085;
+      }
+
+      /* OUTPUT */
+      .result {
+        margin-top: 20px;
+        white-space: pre-line;
+        background: #04101e;
+        padding: 20px;
+        border-radius: 12px;
+      }
+    </style>
+  </head>
+
+  <body>
+    <h1>How are you feeling?</h1>
+    <div class="subtitle">⚕ AI HEALTHCARE CHATBOT WITH VOICE RECOGNITION</div>
+
+    <div class="card">
+      <p>DESCRIBE YOUR SYMPTOMS</p>
+
+      <textarea
+        id="symptoms"
+        placeholder="e.g. fever, headache, sore throat"
+      ></textarea>
+
+      <div class="tags">
+        <span class="tag" onclick="add('fever')">Fever</span>
+        <span class="tag" onclick="add('headache')">Headache</span>
+        <span class="tag" onclick="add('cough')">Cough</span>
+        <span class="tag" onclick="add('fatigue')">Fatigue</span>
+        <span class="tag" onclick="add('sore throat')">Sore throat</span>
+      </div>
+
+      <button onclick="analyze()">ANALYZE SYMPTOMS</button>
+      <button class="voice-btn" onclick="startVoice()">
+        🎤 Speak Symptoms
+      </button>
+
+      <div id="result" class="result"></div>
+    </div>
+
+    <script>
+      // =======================
+      // ADD TAG
+      // =======================
+      function add(symptom) {
+        let box = document.getElementById("symptoms");
+        if (box.value === "") box.value = symptom;
+        else box.value += ", " + symptom;
+      }
+
+      // =======================
+      // TEXT TO SPEECH 🔊
+      // =======================
+      function speak(text) {
+        let speech = new SpeechSynthesisUtterance(text);
+        speech.rate = 1;
+        speech.pitch = 1;
+        speech.lang = "en-US";
+        window.speechSynthesis.speak(speech);
+      }
+
+      // =======================
+      // ANALYZE
+      // =======================
+      function analyze() {
+        let text = document.getElementById("symptoms").value;
+
+        if (!text.trim()) {
+          alert("Enter symptoms first");
+          return;
+        }
+
+        fetch("/chat", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ message: text }),
+        })
+          .then((res) => res.json())
+          .then((data) => {
+            document.getElementById("result").innerText = data.reply;
+
+            // 🔊 SPEAK OUTPUT
+            speak("Based on your symptoms, " + data.disease);
+          });
+      }
+
+      // =======================
+      // VOICE INPUT 🎤
+      // =======================
+      function startVoice() {
+        if (!("webkitSpeechRecognition" in window)) {
+          alert("Use Chrome browser");
+          return;
+        }
+
+        let recognition = new webkitSpeechRecognition();
+        recognition.lang = "en-US";
+
+        recognition.start();
+
+        recognition.onresult = function (event) {
+          let text = event.results[0][0].transcript;
+          document.getElementById("symptoms").value = text;
+
+          analyze(); // auto run
+        };
+      }
+    </script>
+  </body>
+</html>
