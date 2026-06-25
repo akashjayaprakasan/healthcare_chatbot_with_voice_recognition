@@ -5,12 +5,16 @@ from collections import Counter
 
 app = Flask(__name__)
 
+@app.route("/")
+def home():
+    return render_template("index.html")
 model, mlb = joblib.load("model/disease_classifier.pkl")
 
-# 🧠 MEMORY
+
+#  MEMORY
 memory = {"symptoms": []}
 
-# 🩺 FULL HEALTH DATA (all diseases)
+#  FULL HEALTH DATA (all diseases)
 health_advice = {
     "flu": {
         "severity": "MEDIUM",
@@ -140,7 +144,7 @@ health_advice = {
     }
 }
 
-# 🔥 SYMPTOM MAP - maps symptoms to diseases (priority rule-based system)
+#  SYMPTOM MAP - maps symptoms to diseases (priority rule-based system)
 # More specific symptoms get higher priority
 symptom_map = {
     # Heart Attack (CRITICAL - highest priority)
