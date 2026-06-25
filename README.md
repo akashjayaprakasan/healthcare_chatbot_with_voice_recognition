@@ -180,3 +180,7 @@ Consult a doctor if symptoms become severe.
 ## License
 
 This project is created for academic and educational purposes.
+
+## Live Demo
+
+[Open the Live Application](https://healthcare-chatbot-with-voice-recognition.onrender.com/)
